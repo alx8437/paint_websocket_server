@@ -6,15 +6,17 @@ const aWss = WSServer.getWss();
 const PORT = process.env.PORT || 5005;
 
 app.ws('/', (ws, req) => {
-    console.log('Connection was successful')
-    ws.send('You connect successful')
     ws.on('message', (msg => {
         msg = JSON.parse(msg);
         switch (msg.method) {
-            case 'connection':
+            case 'connection': {
                 connectionHandler(ws, msg)
-
                 break
+            }
+            case 'draw': {
+                broadcastConnection(ws, msg)
+            }
+
         }
     }))
 })
@@ -31,8 +33,10 @@ const connectionHandler = (ws, msg) => {
 const broadcastConnection = (ws, msg) => {
     aWss.clients.forEach(client => {
         if (client.id === msg.id) {
-            client.send(`User ${msg.username} was connected`)
+            client.send(JSON.stringify(msg))
         }
     })
+
+
 }
 
