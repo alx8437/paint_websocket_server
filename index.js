@@ -40,7 +40,11 @@ app.post('/image', (req, res) => {
 })
 app.get('/image', (req, res) => {
     try {
-
+        const savePath = path.resolve(__dirname, 'files', `${req.query.id}.jpg`);
+        const file = fs.readFileSync(savePath);
+        const data = `data:image/png;base64,` + file.toString('base64');
+        res.json(data);
+        return res.status(200).json({message: 'file sent'})
     } catch (e) {
         console.log(e)
         return res.status(500).json('error');
