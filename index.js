@@ -2,8 +2,14 @@ const express = require('express');
 const app = express();
 const WSServer = require('express-ws')(app);
 const aWss = WSServer.getWss();
+const cors = require('cors');
+const fs = require('fs');
+const path = require('path');
 
 const PORT = process.env.PORT || 5005;
+
+app.use(cors())
+app.use(express.json());
 
 app.ws('/', (ws, req) => {
     ws.on('message', (msg => {
@@ -19,6 +25,26 @@ app.ws('/', (ws, req) => {
 
         }
     }))
+})
+
+app.post('/image', (req, res) => {
+    try {
+        const data = req.body.img.replace(`data:image/png;base64,`, '');
+        const savePath = path.resolve(__dirname, 'files', `${req.query.id}.jpg`);
+        fs.writeFileSync(savePath, data, 'base64');
+        return res.status(200).json({message: 'downloaded'})
+    } catch (e) {
+        console.log(e)
+        return res.status(500).json('error');
+    }
+})
+app.get('/image', (req, res) => {
+    try {
+
+    } catch (e) {
+        console.log(e)
+        return res.status(500).json('error');
+    }
 })
 
 app.listen(PORT, () => {
